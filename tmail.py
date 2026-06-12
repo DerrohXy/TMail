@@ -25,7 +25,7 @@ def save_config_interactive():
         "port": int(port),
         "user": user,
         "password": password,
-        "use_tls": use_tls in ("y", "yes", "true", "1")
+        "use_tls": use_tls in ("y", "yes", "true", "1"),
     }
 
     CONFIG_PATH.write_text(json.dumps(config, indent=2))
@@ -36,9 +36,7 @@ def save_config_interactive():
 
 def load_config():
     if not CONFIG_PATH.exists():
-        raise FileNotFoundError(
-            f"No config found. Run: tmail.py config"
-        )
+        raise FileNotFoundError(f"No config found. Run: tmail.py config")
 
     return json.loads(CONFIG_PATH.read_text())
 
@@ -58,10 +56,7 @@ def build_message(subject, body, sender, recipient, attachments):
 
         data = path.read_bytes()
         msg.add_attachment(
-            data,
-            maintype="application",
-            subtype="octet-stream",
-            filename=path.name
+            data, maintype="application", subtype="octet-stream", filename=path.name
         )
 
     return msg
@@ -84,18 +79,26 @@ def run_send(args):
     sender = config["user"]
 
     attachments = args.file or []
+    processed_recipients: list[str] = []
 
     for recipient in args.to:
+        recipient_ = sender if recipient == "SELF" else recipient
+
+        if recipient_ in processed_recipients:
+            continue
+
         msg = build_message(
             subject=args.subject,
             body=args.message,
             sender=sender,
-            recipient=recipient,
-            attachments=attachments
+            recipient=recipient_,
+            attachments=attachments,
         )
 
         send_email(config, msg)
-        print(f"Sent email to {recipient}")
+        processed_recipients.append(recipient_)
+
+        print(f"Sent email to {recipient_}")
 
 
 HELP_MESSAGE = """
@@ -107,6 +110,7 @@ tmail send *args : Send email
     --file -> File attachments, takes filepath, multiple declarations allowed
 """
 
+
 def main():
     parser = argparse.ArgumentParser(description="TMail SMTP CLI tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -117,11 +121,13 @@ def main():
     send.add_argument("--subject", required=True)
     send.add_argument("--message", required=True)
 
-    send.add_argument("--to", action="append", required=True,
-                      help="Recipient email (repeatable)")
+    send.add_argument(
+        "--to", action="append", required=True, help="Recipient email (repeatable)"
+    )
 
-    send.add_argument("--file", action="append", default=[],
-                      help="Attachment file path (repeatable)")
+    send.add_argument(
+        "--file", action="append", default=[], help="Attachment file path (repeatable)"
+    )
 
     args = parser.parse_args()
 
