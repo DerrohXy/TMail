@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
+import getpass
 import json
 import smtplib
 from email.message import EmailMessage
 from pathlib import Path
-import getpass
 
 CONFIG_PATH = Path.home() / ".tmail.config"
 
