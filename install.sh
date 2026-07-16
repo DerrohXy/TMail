@@ -19,7 +19,6 @@ chmod +x "$TARGET"
 
 echo "Installed to $TARGET"
 
-
 SHELL_RC=""
 
 if [ -n "$ZSH_VERSION" ]; then

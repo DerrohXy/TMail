@@ -36,7 +36,7 @@ def save_config_interactive():
 
 def load_config():
     if not CONFIG_PATH.exists():
-        raise FileNotFoundError(f"No config found. Run: tmail.py config")
+        raise FileNotFoundError("No config found. Run: tmail.py config")
 
     return json.loads(CONFIG_PATH.read_text())
 

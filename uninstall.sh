@@ -9,7 +9,7 @@ echo "Uninstalling tmail..."
 
 if [[ -f "$TARGET" ]]; then
   rm "$TARGET"
-  echo "Tmail uninstalled."
+  echo "tmail uninstalled."
 else
-  echo "Tmail installation not found."
+  echo "tmail installation not found."
 fi
